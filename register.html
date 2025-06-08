@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - icemc.site</title>
-    <link rel="stylesheet" href="./css/main.css">
-    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="components.css">
     <style>
         .register-form {
             background: var(--surface-color);
@@ -62,7 +62,7 @@
     <header class="main-header">
         <nav class="nav-container">
             <div class="logo">
-                <img src="/images/logo.png" alt="icemc.site logo" width="40" height="40">
+                <img src="logo.png" alt="icemc.site logo" width="40" height="40">
             </div>
         </nav>
     </header>
@@ -97,10 +97,10 @@
     </main>
 
     <script type="module">
-        import { auth, database } from './js/firebase-config.js';
+        import { auth, database } from 'firebase-config.js';
         import { createUserWithEmailAndPassword } from 'firebase/auth';
         import { ref, set } from 'firebase/database';
-        import { redirectIfAuthenticated } from './js/auth-guard.js';
+        import { redirectIfAuthenticated } from 'auth-guard.js';
 
         // Check if user is already authenticated
         redirectIfAuthenticated();
