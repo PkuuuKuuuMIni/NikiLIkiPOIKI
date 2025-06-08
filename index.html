@@ -262,11 +262,11 @@
     <header class="main-header">
         <nav class="nav-container">
             <div class="logo">
-                <img src="./images/logo.png" alt="icemc.site logo">
+                <img src="logo.png" alt="icemc.site logo">
             </div>
             <div class="nav-links" id="navLinks">
-                <a href="./login.html" class="nav-button outline">Login</a>
-                <a href="./register.html" class="nav-button primary">Sign Up</a>
+                <a href="login.html" class="nav-button outline">Login</a>
+                <a href="register.html" class="nav-button primary">Sign Up</a>
             </div>
         </nav>
     </header>
@@ -294,7 +294,7 @@
     </main>
 
     <script type="module">
-        import { database } from './js/firebase-config.js';
+        import { database } from 'firebase-config.js';
         import { ref, get } from 'firebase/database';
         import { redirectIfAuthenticated } from './js/auth-guard.js';
 
