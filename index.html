@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>icemc.site - Create Your Profile</title>
+    <meta name="description" content="Create and share your personal profile on icemc.site">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <!-- Firebase SDK -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/main.js"></script>
+    <style>
+        /* Root Variables */
+        :root {
+            --primary-color: #9D4EDD;
+            --primary-dark: #6C3299;
+            --secondary-color: #240046;
+            --background-color: #10002B;
+            --surface-color: #1A0040;
+            --text-color: #E0AAFF;
+            --text-muted: #C77DFF;
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 100% 0%, rgba(157, 78, 221, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, rgba(157, 78, 221, 0.1) 0%, transparent 50%);
+        }
+
+        /* Header Styles */
+        .main-header {
+            background: rgba(26, 0, 64, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img {
+            width: 190px; /* Можеш да промениш тази стойност */
+            height: 90px; /* Можеш да промениш тази стойност */
+            display: block; /* Помага за по-добро подравняване */
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 1rem;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #E0AAFF 0%, #9D4EDD 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        /* Username Claim Box */
+        .claim-box {
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(157, 78, 221, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-top: 2rem;
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+        }
+
+        .url-input-group {
+            display: flex;
+            align-items: center;
+            background: rgba(16, 0, 43, 0.6);
+            border: 2px solid var(--primary-dark);
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .url-prefix {
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-right: 2px solid var(--primary-dark);
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        .username-input {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            font-size: 1.1rem;
+            width: 100%;
+            font-family: monospace;
+        }
+
+        .username-input:focus {
+            outline: none;
+        }
+
+        .claim-button {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .claim-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(157, 78, 221, 0.4);
+        }
+
+        .claim-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Status Messages */
+        .status-message {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .status-available {
+            background-color: rgba(47, 255, 158, 0.1);
+            color: #2fff9e;
+            border: 1px solid rgba(47, 255, 158, 0.2);
+        }
+
+        .status-taken {
+            background-color: rgba(255, 47, 47, 0.1);
+            color: #ff2f2f;
+            border: 1px solid rgba(255, 47, 47, 0.2);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Navigation Buttons */
+        .nav-button {
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: all var(--transition-speed);
+        }
+
+        .nav-button.outline {
+            color: var(--text-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .nav-button.outline:hover {
+            background: rgba(157, 78, 221, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-button.primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.3);
+        }
+
+        .nav-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(157, 78, 221, 0.4);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+            }
+
+            .claim-box {
+                margin: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="nav-container">
+            <div class="logo">
+                <img src="./images/logo.png" alt="icemc.site logo">
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="./login.html" class="nav-button outline">Login</a>
+                <a href="./register.html" class="nav-button primary">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Claim your new account</h1>
+            <p>Type your new account name</p>
+            <p>Start your adventure today</p>
+            
+            <div class="claim-box">
+                <div class="url-input-group">
+                    <span class="url-prefix">icemc.lol/</span>
+                    <input type="text" 
+                           class="username-input" 
+                           id="usernameInput"
+                           placeholder="username"
+                           pattern="[a-zA-Z0-9_-]{3,15}"
+                           maxlength="15">
+                </div>
+                <button class="claim-button" id="claimButton" disabled>Claim Username</button>
+                <div id="statusMessage"></div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { database } from './js/firebase-config.js';
+        import { ref, get } from 'firebase/database';
+        import { redirectIfAuthenticated } from './js/auth-guard.js';
+
+        // Check if user is already authenticated
+        redirectIfAuthenticated();
+
+        const usernameInput = document.getElementById('usernameInput');
+        const claimButton = document.getElementById('claimButton');
+        const statusMessage = document.getElementById('statusMessage');
+        let usernameTimer;
+        let isUsernameAvailable = false;
+
+        // Username input handler with debounce
+        usernameInput.addEventListener('input', (e) => {
+            const username = e.target.value.toLowerCase();
+            
+            clearTimeout(usernameTimer);
+            statusMessage.innerHTML = '';
+            claimButton.disabled = true;
+            isUsernameAvailable = false;
+            
+            if (username.length < 3) {
+                showStatus('Username must be at least 3 characters', 'taken');
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9_-]{3,15}$/.test(username)) {
+                showStatus('Username can only contain letters, numbers, - and _', 'taken');
+                return;
+            }
+
+            // Show checking status
+            showStatus('Checking availability...', 'checking');
+
+            // Check availability after 500ms of no typing
+            usernameTimer = setTimeout(() => checkUsername(username), 500);
+        });
+
+        // Check username availability
+        async function checkUsername(username) {
+            try {
+                const usernameRef = ref(database, `usernames/${username}`);
+                const snapshot = await get(usernameRef);
+                
+                if (snapshot.exists()) {
+                    showStatus('Username is already taken', 'taken');
+                    claimButton.disabled = true;
+                    isUsernameAvailable = false;
+                } else {
+                    showStatus('Username is available!', 'available');
+                    claimButton.disabled = false;
+                    isUsernameAvailable = true;
+                }
+            } catch (error) {
+                console.error('Error checking username:', error);
+                showStatus('Error checking username', 'taken');
+                claimButton.disabled = true;
+                isUsernameAvailable = false;
+            }
+        }
+
+        // Claim button handler
+        claimButton.addEventListener('click', () => {
+            const username = usernameInput.value.toLowerCase();
+            
+            if (!isUsernameAvailable) {
+                showStatus('Please choose an available username', 'taken');
+                return;
+            }
+
+            // Store username in session storage
+            sessionStorage.setItem('claimedUsername', username);
+            
+            // Redirect to registration page
+            window.location.href = '/public/register.html';
+        });
+
+        function showStatus(message, type) {
+            statusMessage.className = `status-message status-${type}`;
+            statusMessage.textContent = message;
+        }
+
+        // Add checking status style
+        const style = document.createElement('style');
+        style.textContent = `
+            .status-checking {
+                background-color: rgba(157, 78, 221, 0.1);
+                color: var(--text-muted);
+                border: 1px solid rgba(157, 78, 221, 0.2);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

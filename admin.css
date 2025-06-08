@@ -1,0 +1,85 @@
+/* admin.css - Специфични стилове за административния панел */
+body.admin-page {
+    background-color: #f0f2f5; /* По-светъл фон за админ панела */
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Outfit', sans-serif;
+}
+
+.admin-login-container,
+.admin-dashboard-container {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px; /* За login контейнера */
+}
+
+.admin-dashboard-container {
+    max-width: 900px; /* По-широк за таблото */
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-login-container h2,
+.admin-header h2 {
+    color: var(--primary-color, #9D4EDD); /* Използваме променлива от main.css, ако е заредена */
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.user-table th, .user-table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.user-table th {
+    background-color: #f9f9f9;
+}
+
+.btn-delete-user {
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn-delete-user:hover {
+    background-color: #d9363e;
+}

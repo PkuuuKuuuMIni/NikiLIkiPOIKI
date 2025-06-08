@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - icemc.lol</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <style>
+        .dashboard {
+            max-width: 1200px;
+            margin: 8rem auto 2rem;
+            padding: 0 1rem;
+        }
+
+        .welcome-card {
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(157, 78, 221, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-text h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-url {
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .profile-url strong {
+            color: var(--primary-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            border: 1px solid rgba(157, 78, 221, 0.1);
+        }
+
+        .stat-card h3 {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #E0AAFF 0%, #9D4EDD 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .edit-profile-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all var(--transition-speed);
+        }
+
+        .edit-profile-btn.primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+        }
+
+        .edit-profile-btn.outline {
+            border: 2px solid var(--primary-color);
+            color: var(--text-color);
+        }
+
+        .edit-profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(157, 78, 221, 0.4);
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            transition: color var(--transition-speed);
+        }
+
+        .logout-btn:hover {
+            color: var(--text-color);
+        }
+
+        @media (max-width: 768px) {
+            .welcome-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .edit-profile-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingOverlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--background-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    ">
+        <div style="
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--primary-dark);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        "></div>
+    </div>
+
+    <header class="main-header">
+        <nav class="nav-container">
+            <div class="logo">
+                <img src="/images/logo.png" alt="icemc.lol logo" width="40" height="40">
+            </div>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </nav>
+    </header>
+
+    <main class="dashboard" style="display: none;">
+        <div class="welcome-card">
+            <div class="welcome-text">
+                <h1>Welcome back, <span id="username">User</span>!</h1>
+                <p class="profile-url">Your profile: <strong id="profileUrl">icemc.lol/</strong></p>
+            </div>
+            <div class="action-buttons">
+                <a href="/edit-profile.html" class="edit-profile-btn primary">Edit Profile</a>
+                <a href="#" class="edit-profile-btn outline" id="viewProfileBtn">View Profile</a>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Profile Views</h3>
+                <div class="value" id="viewCount">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Link Clicks</h3>
+                <div class="value" id="clickCount">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Days Active</h3>
+                <div class="value" id="daysActive">0</div>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+
+    <script type="module">
+        import { auth, database } from './js/firebase-config.js';
+        import { signOut } from 'firebase/auth';
+        import { ref, onValue } from 'firebase/database';
+        import { protectRoute } from './js/auth-guard.js';
+
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const dashboardContent = document.querySelector('.dashboard');
+
+        // Protect the route and initialize dashboard
+        async function initDashboard() {
+            try {
+                const user = await protectRoute();
+                if (!user) return; // Will redirect if not authenticated
+
+                // Get user data
+                const userRef = ref(database, `users/${user.uid}`);
+                onValue(userRef, (snapshot) => {
+                    const userData = snapshot.val();
+                    if (userData) {
+                        // Update UI with user data
+                        document.getElementById('username').textContent = userData.username;
+                        document.getElementById('profileUrl').textContent = `icemc.lol/${userData.username}`;
+                        
+                        // Set up view profile button
+                        document.getElementById('viewProfileBtn').href = `/${userData.username}`;
+
+                        // Calculate days active
+                        const createdAt = new Date(userData.createdAt);
+                        const now = new Date();
+                        const daysActive = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24));
+                        document.getElementById('daysActive').textContent = daysActive;
+
+                        // Update stats if available
+                        if (userData.viewCount) {
+                            document.getElementById('viewCount').textContent = userData.viewCount;
+                        }
+                        if (userData.linkClicks) {
+                            document.getElementById('clickCount').textContent = userData.linkClicks;
+                        }
+
+                        // Show dashboard and hide loading
+                        loadingOverlay.style.display = 'none';
+                        dashboardContent.style.display = 'block';
+                    }
+                });
+            } catch (error) {
+                console.error('Authentication error:', error);
+                // Will be redirected by protectRoute
+            }
+        }
+
+        // Initialize the dashboard
+        initDashboard();
+
+        // Handle logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                window.location.href = '/';
+            } catch (error) {
+                console.error('Error signing out:', error);
+            }
+        });
+    </script>
+</body>
+</html>

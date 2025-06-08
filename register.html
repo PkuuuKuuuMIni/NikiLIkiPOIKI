@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - icemc.site</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <style>
+        .register-form {
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(157, 78, 221, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            background: rgba(16, 0, 43, 0.6);
+            border: 2px solid var(--primary-dark);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .username-display {
+            background: rgba(157, 78, 221, 0.1);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--primary-dark);
+        }
+
+        .username-display span {
+            font-family: monospace;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="nav-container">
+            <div class="logo">
+                <img src="/images/logo.png" alt="icemc.site logo" width="40" height="40">
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Create your account</h1>
+            <p>Complete your registration to claim your profile</p>
+            
+            <div class="register-form">
+                <div class="username-display">
+                    Your profile URL: <span id="profileUrl">icemc.site/</span>
+                </div>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" required minlength="6">
+                    </div>
+                    <button type="submit" class="claim-button">Create Account</button>
+                </form>
+                <div id="statusMessage"></div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { auth, database } from './js/firebase-config.js';
+        import { createUserWithEmailAndPassword } from 'firebase/auth';
+        import { ref, set } from 'firebase/database';
+        import { redirectIfAuthenticated } from './js/auth-guard.js';
+
+        // Check if user is already authenticated
+        redirectIfAuthenticated();
+
+        // Get claimed username from session storage
+        const username = sessionStorage.getItem('claimedUsername');
+        if (!username) {
+            window.location.href = '/';
+        }
+
+        // Display the username in the UI
+        document.getElementById('profileUrl').textContent = `icemc.site/${username}`;
+
+        const registerForm = document.getElementById('registerForm');
+        const statusMessage = document.getElementById('statusMessage');
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                showStatus('Passwords do not match', 'taken');
+                return;
+            }
+
+            try {
+                // Create user account
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Save user data
+                await set(ref(database, `users/${user.uid}`), {
+                    username: username,
+                    email: email,
+                    createdAt: new Date().toISOString()
+                });
+
+                // Save username mapping
+                await set(ref(database, `usernames/${username}`), user.uid);
+
+                // Clear session storage
+                sessionStorage.removeItem('claimedUsername');
+
+                // Redirect to dashboard
+                window.location.href = `/dashboard.html`;
+            } catch (error) {
+                console.error('Registration error:', error);
+                showStatus(error.message, 'taken');
+            }
+        });
+
+        function showStatus(message, type) {
+            statusMessage.className = `status-message status-${type}`;
+            statusMessage.textContent = message;
+        }
+    </script>
+</body>
+</html> 

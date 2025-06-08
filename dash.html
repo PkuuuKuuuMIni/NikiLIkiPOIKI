@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Администраторско Табло - icemc.lol</title>
+    <link rel="stylesheet" href="../css/main.css"> <!-- Общи стилове -->
+    <link rel="stylesheet" href="admin.css">   <!-- Специфични админ стилове -->
+</head>
+<body>
+    <div class="admin-dashboard-container" id="admin-dashboard">
+        <header class="admin-header">
+            <h2>Администраторско Табло</h2>
+            <button id="admin-logout-btn" class="btn btn-secondary">Изход</button>
+        </header>
+
+        <section class="user-management">
+            <h3>Управление на Потребители</h3>
+            <!-- <div class="search-bar">
+                <input type="text" id="user-search" placeholder="Търси по имейл или потребителско име...">
+                <button class="btn btn-search">Търси</button>
+            </div> -->
+
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Имейл</th>
+                        <th>Потребителско име (от профила)</th>
+                        <th>UID</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="users-list">
+                    <tr>
+                        <td colspan="4" style="text-align: center;">Зареждане на потребители...</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p id="user-count"></p>
+        </section>
+    </div>
+
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="admin.js"></script>
+</body>
+</html>

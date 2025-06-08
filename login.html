@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Административен Вход - icemc.site</title>
+    <link rel="stylesheet" href="../css/main.css"> <!-- Общи стилове, ако са нужни -->
+    <link rel="stylesheet" href="admin.css">   <!-- Специфични админ стилове -->
+</head>
+<body class="admin-page">
+    <div class="admin-login-container">
+        <h2>Вход за Администратор</h2>
+        <form id="admin-login-form">
+            <div class="form-group">
+                <label for="email">Имейл:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Парола:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Вход</button>
+            <p id="login-error-message" class="error-message"></p>
+        </form>
+    </div>
+
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
