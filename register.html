@@ -1,12 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - icemc.site</title>
+    <title>Регистрация - icemc.lol</title>
     <link rel="stylesheet" href="main.css">
     <link rel="stylesheet" href="components.css">
     <style>
+        /* CSS от вашия оригинален файл, преместен тук за удобство или във components.css */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--background-color); /* Уверете се, че тези променливи са дефинирани в main.css */
+            color: var(--text-color);
+        }
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .hero {
+            text-align: center;
+            padding: 2rem 1rem;
+            width: 100%;
+            max-width: 600px;
+        }
         .register-form {
             background: var(--surface-color);
             border-radius: var(--border-radius);
@@ -49,6 +71,7 @@
             border-radius: var(--border-radius);
             margin-bottom: 1.5rem;
             border: 1px solid var(--primary-dark);
+            font-size: 0.95rem;
         }
 
         .username-display span {
@@ -57,114 +80,101 @@
             font-weight: 600;
         }
         .logo img {
-            width: 190px; /* Можеш да промениш тази стойност */
-            height: 90px; /* Можеш да промениш тази стойност */
-            display: block; /* Помага за по-добро подравняване */
+            width: 190px;
+            height: 90px;
+            display: block;
+            margin: 0 auto; /* Центриране */
         }
-
+        .claim-button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .claim-button:hover {
+            background-color: var(--primary-dark);
+        }
+        .status-message {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            text-align: center;
+        }
+        .status-message.status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-message.status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .form-links {
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .form-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .form-links a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <header class="main-header">
         <nav class="nav-container">
             <div class="logo">
-                <img src="logo.png" alt="icemc.site logo">
+                <a href="/">
+                    <img src="logo.png" alt="icemc.lol logo">
+                </a>
             </div>
         </nav>
     </header>
 
     <main>
         <section class="hero">
-            <h1>Create your account</h1>
-            <p>Complete your registration to claim your profile</p>
-            
+            <h1>Създайте своя акаунт</h1>
+            <p>Завършете регистрацията си, за да заявите своя профил</p>
+
             <div class="register-form">
                 <div class="username-display">
-                    Your profile URL: <span id="profileUrl">icemc.site/</span>
+                    Вашият профил URL: <span id="profileUrl">icemc.lol/</span><span id="claimedUsernameDisplay"></span>
                 </div>
                 <form id="registerForm">
                     <div class="form-group">
-                        <label for="email">Email</label>
+                        <label for="email">Имейл</label>
                         <input type="email" id="email" required>
                     </div>
                     <div class="form-group">
-                        <label for="password">Password</label>
+                        <label for="password">Парола</label>
                         <input type="password" id="password" required minlength="6">
                     </div>
                     <div class="form-group">
-                        <label for="confirmPassword">Confirm Password</label>
+                        <label for="confirmPassword">Потвърдете паролата</label>
                         <input type="password" id="confirmPassword" required minlength="6">
                     </div>
-                    <button type="submit" class="claim-button">Create Account</button>
+                    <button type="submit" class="claim-button">Създаване на акаунт</button>
                 </form>
-                <div id="statusMessage"></div>
+                <div id="statusMessage" class="status-message"></div>
+                <div class="form-links">
+                    <a href="login.html">Вече имате акаунт? Влезте тук.</a><br>
+                    <a href="#" id="forgotPasswordLink">Забравена парола?</a>
+                </div>
             </div>
         </section>
     </main>
 
-    <script type="module">
-        import { auth, database } from 'firebase-config.js';
-        import { createUserWithEmailAndPassword } from 'firebase/auth';
-        import { ref, set } from 'firebase/database';
-        import { redirectIfAuthenticated } from 'auth-guard.js';
-
-        // Check if user is already authenticated
-        redirectIfAuthenticated();
-
-        // Get claimed username from session storage
-        const username = sessionStorage.getItem('claimedUsername');
-        if (!username) {
-            window.location.href = '/';
-        }
-
-        // Display the username in the UI
-        document.getElementById('profileUrl').textContent = `icemc.site/${username}`;
-
-        const registerForm = document.getElementById('registerForm');
-        const statusMessage = document.getElementById('statusMessage');
-
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (password !== confirmPassword) {
-                showStatus('Passwords do not match', 'taken');
-                return;
-            }
-
-            try {
-                // Create user account
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-
-                // Save user data
-                await set(ref(database, `users/${user.uid}`), {
-                    username: username,
-                    email: email,
-                    createdAt: new Date().toISOString()
-                });
-
-                // Save username mapping
-                await set(ref(database, `usernames/${username}`), user.uid);
-
-                // Clear session storage
-                sessionStorage.removeItem('claimedUsername');
-
-                // Redirect to dashboard
-                window.location.href = `/dashboard.html`;
-            } catch (error) {
-                console.error('Registration error:', error);
-                showStatus(error.message, 'taken');
-            }
-        });
-
-        function showStatus(message, type) {
-            statusMessage.className = `status-message status-${type}`;
-            statusMessage.textContent = message;
-        }
-    </script>
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="register.js"></script>
 </body>
-</html> 
+</html>
